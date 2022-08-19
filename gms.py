@@ -23,10 +23,6 @@ def validateUsername(username):
         error += "Make sure your username is at lest 4 letters\n"
     if search('[a-z]', username) is None:
         error += "Make sure your username has a lowercase letter in it\n"
-    elif search('[0-9]',username) is None:
-        error += "Make sure your username has a number in it\n"
-    if search('[A-Z]',username) is not None: 
-        error += "Make sure your username doesn't contain a uppercase letter in it\n"
     return error
 
 # password validation
@@ -147,7 +143,7 @@ def updateDetails(option):
             if error == "":
                 cur.execute("select * from {} where password='{}'".format(role, newPassword))
                 if cur.fetchone() == None:
-                    cur.execute("update {} set password='{}' where password='{}'".format(role, newPassword, password))
+                    cur.execute("update {} set password='{}' where username='{}'".format(role, newPassword, username))
                     conn.commit()
                     password = newPassword
                     print("Password Changed")
@@ -160,7 +156,7 @@ def updateDetails(option):
         if newName == name:
             print("New Name is same as Old Name")
         else:
-            cur.execute("update {} set name='{}' where name='{}'".format(role, newName, name))
+            cur.execute("update {} set name='{}' where username='{}'".format(role, newName, username))
             conn.commit()
             name = newName
             print("Name Updated")
@@ -173,7 +169,7 @@ def updateDetails(option):
         if validateEmail(newEmail):
             cur.execute("select * from {} where email='{}'".format(role, newEmail))
             if cur.fetchone() == None:
-                cur.execute("update {} set email='{}' where email='{}'".format(role, newEmail, email))
+                cur.execute("update {} set email='{}' where username='{}'".format(role, newEmail, username))
                 conn.commit()
                 email = newEmail
                 print("Email ID Updated")
@@ -186,7 +182,7 @@ def updateDetails(option):
         if validatePhoneNumber(newPhone):
             cur.execute("select * from {} where phone='{}'".format(role, newPhone))
             if cur.fetchone() == None:
-                cur.execute("update {} set phone='{}' where phone='{}'".format(role, newPhone, phone))
+                cur.execute("update {} set phone='{}' where username='{}'".format(role, newPhone, username))
                 conn.commit()
                 phone = newPhone
                 print("Phone Number Updated")
@@ -201,7 +197,7 @@ def deleteCustomerRecord():
     if len(record) == 0:
         print("The Customer with the given Detail doesn't exist")
     else:
-        print(record[0], record[1], record[3], record[4], record[5], record[6], record[7])
+        print(record[0], record[1], record[3], record[4], record[5], record[6])
         inp = input("This is irreversible. Are you Sure [Y/N]? ").lower()
         if inp == 'y':
             try:
@@ -215,12 +211,11 @@ def deleteCustomerRecord():
 
 # show all customer details
 def fetchAllCustomerDetails():
-    print("ID  Username" + " "*13 + "Name" + " "*17 + "Gender  Email ID" + " "*8 + "Phone No." + " "*4 + "Payment Mode")
+    print("ID  Username" + " "*13 + "Name" + " "*17 + "Gender  Email ID" + " "*8 + "Phone No." + " "*4)
     records = cur.execute("select * from customer").fetchall()
-    noOfRecords = len(records)
     for record in records:
-        print("{:<3} {:<20} {:<20} {:<7} {:<15} {:<12} {:<5}".format(record[0], record[1], record[3], record[4], record[5], record[6], record[7]))
-        # print(record[0], record[1], record[3], record[4], record[5], record[6], record[7])
+        # formatting problem
+        print("{0:3d} {0:20d} {0:20d} {0:7d} {0:15d} {0:12d}".format(record[0], record[1], record[3], record[4], record[5], record[6]))
 
 # logout
 def logout():
