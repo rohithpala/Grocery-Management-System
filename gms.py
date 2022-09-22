@@ -141,12 +141,10 @@ def updateDetails(option):
             newPassword = input("Enter New Password: ")
             error = validatePassword(newPassword)
             if error == "":
-                cur.execute("select * from {} where password='{}'".format(role, newPassword))
-                if cur.fetchone() == None:
-                    cur.execute("update {} set password='{}' where username='{}'".format(role, newPassword, username))
-                    conn.commit()
-                    password = newPassword
-                    print("Password Changed")
+                cur.execute("update {} set password='{}' where username='{}'".format(role, newPassword, username))
+                conn.commit()
+                password = newPassword
+                print("Password Changed")
             else:
                 print(error)
         except:
@@ -358,5 +356,4 @@ def main():
 
 # calling main function
 if __name__ == "__main__":
-    print('To exit type "exit"')
     main()
