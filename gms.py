@@ -213,7 +213,7 @@ def fetchAllCustomerDetails():
     records = cur.execute("select * from customer").fetchall()
     for record in records:
         # formatting problem
-        print("{0:3d} {0:20d} {0:20d} {0:7d} {0:15d} {0:12d}".format(record[0], record[1], record[3], record[4], record[5], record[6]))
+        print("{} {} {} {} {} {}".format(record[0], record[1], record[3], record[4], record[5], record[6]))
 
 # logout
 def logout():
@@ -234,7 +234,7 @@ def showGroceries():
 # previous orders placed by customers
 def showPreviousOrders():
     global uid
-    cart = cur.execute("select g.*, c.quantity from grocery g, cart c where cid='{}'".format(uid)).fetchall()
+    cart = cur.execute("select g.gid, g.name, g.weight, g.price, g.description, g.type, g.mfg, g.exp, g.stock_remaining, c.quantity from grocery g, cart c where g.gid=c.gid and cid='{}'".format(uid)).fetchall()
     if len(cart) == 0:
         print("\nYou have no Previous orders\n")
     else:
@@ -245,8 +245,11 @@ def showPreviousOrders():
 # lets user place an order
 def placeOrder():
     global uid
-    stockLeft = showGroceries()
+    showGroceries()
     gid = input("Enter the ID of the Grocery: ")
+    cur.execute("select stock_remaining from grocery where gid='{}'".format(gid))
+    stockLeft = cur.fetchone()[0]
+    print(stockLeft)
     while True:
         quantity = int(input("Enter Quantity of the Grocery Required: "))
         if quantity > stockLeft:
@@ -255,7 +258,8 @@ def placeOrder():
             try:
                 cur.execute("insert into cart values('{}', '{}', '{}')".format(uid, gid, quantity))
                 conn.commit()
-                cur.execute("update grocery set stock_remaining='{}' where gid='{}'".format(stockLeft-quantity, gid))
+                stockLeft -= quantity
+                cur.execute("update grocery set stock_remaining='{}' where gid='{}'".format(stockLeft, gid))
                 conn.commit()
                 print("\nOrder Placed\n")
             except Exception as e:
